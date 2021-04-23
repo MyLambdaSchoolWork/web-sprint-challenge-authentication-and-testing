@@ -17,26 +17,27 @@ beforeEach( async () => {
 
 describe('/api/auth', () => {
   describe('/register', () => {
+    const path = '/api/auth/register'
     it('fails if username or password not provided', async () => {
-      let res = await request(server).post().send({})
+      let res = await request(server).post(path).send({})
       expect(res.status).toBe(400)
       expect(res.body.message).toBe('username and password required')
       
-      res = await request(server).post().send({username: 'aoeu'})
+      res = await request(server).post(path).send({username: 'aoeu'})
       expect(res.status).toBe(400)
       expect(res.body.message).toBe('username and password required')
       
-      res = await request(server).post().send({password: 'aoeu'})
+      res = await request(server).post(path).send({password: 'aoeu'})
       expect(res.status).toBe(400)
       expect(res.body.message).toBe('username and password required')
     })
     it('fails if username not unique', async () => {
-      let res = await request(server).post({ username: 'bobby', password: 'aoeu' })
+      let res = await request(server).post(path).send({ username: 'bobby', password: 'aoeu' })
       expect(res.status).toBe(400)
       expect(res.body.message).toBe('username taken')
     })
     it('sends new user back', async () => {
-      let res = await request(server).post({ username: 'newUser', password: 'aoeu' })
+      let res = await request(server).post(path).send({ username: 'newUser', password: 'aoeu' })
       
       expect(res.status).toBe(201)
       expect(res.body).toHaveProperty('id', 2)
@@ -44,9 +45,9 @@ describe('/api/auth', () => {
       expect(res.body).toHaveProperty('password') // don't know what the hash will look like
     })
     it('adds user to table', async () => {
-      await request(server).post({ username: 'newUser', password: 'aoeu' })
+      await request(server).post(path).send({ username: 'newUser', password: 'aoeu' })
 
-      let res = await request(server).post({ username: 'newUser', password: 'aoeu' })
+      let res = await request(server).post(path).send({ username: 'newUser', password: 'aoeu' })
       expect(res.status).toBe(400)
       expect(res.body.message).toBe('username taken')
     })
