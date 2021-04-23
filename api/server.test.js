@@ -11,9 +11,9 @@ beforeAll( async () => {
   await db.migrate.rollback()
   await db.migrate.latest()
 })
-// beforeEach( async () => {
-//   await db.seed.run()
-// })
+beforeEach( async () => {
+  await db.seed.run()
+})
 
 describe('/api/auth', () => {
   describe('/register', () => {
@@ -37,19 +37,18 @@ describe('/api/auth', () => {
     })
     it('sends new user back', async () => {
       let res = await request(server).post({ username: 'newUser', password: 'aoeu' })
+      
       expect(res.status).toBe(201)
-      expect(res.body).toEqual({
-        id: 2,
-        username: 'newUser',
-        password: '....'
-      })
+      expect(res.body).toHaveProperty('id', 2)
+      expect(res.body).toHaveProperty('username', 'newUser')
+      expect(res.body).toHaveProperty('password') // don't know what the hash will look like
     })
     it('adds user to table', async () => {
       await request(server).post({ username: 'newUser', password: 'aoeu' })
-      
+
       let res = await request(server).post({ username: 'newUser', password: 'aoeu' })
       expect(res.status).toBe(400)
       expect(res.body.message).toBe('username taken')
     })
-  }) 
+  })
 })
