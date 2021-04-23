@@ -95,7 +95,7 @@ describe('/api/jokes', () => {
       expect(res.body.message).toBe('token required')
     })
     it('fails on invalid token', async () => {
-      let res = await request(server).get(path).set('Authorization', 'badToken')
+      let res = await request(server).get(path).set('authorization', 'badToken')
       expect(res.status).toBe(401)
       expect(res.body.message).toBe('token invalid')
     })
@@ -109,7 +109,7 @@ describe('/api/jokes', () => {
       token = loginRes.body.token
     })
     it('returns jokes', async () => {
-      let res = await request(server).get(path).set('Authorization', token)
+      let res = await request(server).get(path).set('authorization', token)
       expect(res.body).toEqual(jokes)
     })
   })
