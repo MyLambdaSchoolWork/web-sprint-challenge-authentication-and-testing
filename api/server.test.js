@@ -52,4 +52,36 @@ describe('/api/auth', () => {
       expect(res.body.message).toBe('username taken')
     })
   })
+  describe('/login', () => {
+    const path = '/api/auth/login'
+    it('fails if username or password not provided', async () => {
+      let res = await request(server).post(path).send({})
+      expect(res.status).toBe(400)
+      expect(res.body.message).toBe('username and password required')
+      
+      res = await request(server).post(path).send({username: 'aoeu'})
+      expect(res.status).toBe(400)
+      expect(res.body.message).toBe('username and password required')
+      
+      res = await request(server).post(path).send({password: 'aoeu'})
+      expect(res.status).toBe(400)
+      expect(res.body.message).toBe('username and password required')
+    })
+    it('fails if bad username', async () => {
+      let res = await request(server).post(path).send({username: 'badusername', password: 'aoeu'})
+      expect(res.status).toBe(401)
+      expect(res.body.message).toBe('invalid credentials')
+    })
+    it('fails if bad password', async () => {
+      let res = await request(server).post(path).send({username: 'bobby', password: 'badpassword'})
+      expect(res.status).toBe(401)
+      expect(res.body.message).toBe('invalid credentials')
+    })
+    it('sends token and proper on success', async () => {
+      let res = await request(server).post(path).send({username: 'bobby', password: 'aoeu'})
+      expect(res.status).toBe(200)
+      expect(res.body.message).toBe('Welcome, bobby')
+      expect(res.body).toHaveProperty('token')
+    })
+  })
 })
