@@ -85,3 +85,32 @@ describe('/api/auth', () => {
     })
   })
 })
+
+describe('/api/jokes', () => {
+  const path = '/api/jokes'
+  describe('auth', () => {
+    it('fails when no token provided', async () => {
+      let res = await request(server).get(path)
+      expect(res.status).toBe(401)
+      expect(res.body.message).toBe('token required')
+    })
+    it('fails on invalid token', async () => {
+      let res = await request(server).get(path).set('Authorization', 'badToken')
+      expect(res.status).toBe(401)
+      expect(res.body.message).toBe('token invalid')
+    })
+  })
+  describe('jokes', () => {
+    const jokes = require('./jokes/jokes-data.js')
+    let loginRes
+    let token
+    beforeEach( async () => {
+      loginRes = await request(server).post('/api/auth/login').send({username: 'bobby', password: 'aoeu'})
+      token = loginRes.body.token
+    })
+    it('returns jokes', async () => {
+      let res = await request(server).get(path).set('Authorization', token)
+      expect(res.body).toEqual(jokes)
+    })
+  })
+})
